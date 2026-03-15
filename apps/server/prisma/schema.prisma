@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  pubKey       String    @id
+  username     String?
+  createdAt    DateTime  @default(now())
+  totpSecret   String?   // Encrypted TOTP secret
+  totpEnabled  Boolean   @default(false)
+  messages     Message[]
+  rooms        Room[]
+}
+
+model Room {
+  id          String    @id
+  name        String?
+  isModerated Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  messages    Message[]
+  members     User[]
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  content       String // Encrypted payload
+  signature     String
+  nonce         String
+  timestamp     BigInt
+  senderPubKey  String
+  sender        User     @relation(fields: [senderPubKey], references: [pubKey])
+  roomId        String
+  room          Room     @relation(fields: [roomId], references: [id])
+  createdAt     DateTime @default(now())
+}

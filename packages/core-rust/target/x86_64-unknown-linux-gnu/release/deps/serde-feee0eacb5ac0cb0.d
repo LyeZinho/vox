@@ -1,0 +1,14 @@
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/serde-feee0eacb5ac0cb0.d: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/build/serde-6bd03d0a97314e8a/out/private.rs
+
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/libserde-feee0eacb5ac0cb0.rlib: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/build/serde-6bd03d0a97314e8a/out/private.rs
+
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/libserde-feee0eacb5ac0cb0.rmeta: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/build/serde-6bd03d0a97314e8a/out/private.rs
+
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/build/serde-6bd03d0a97314e8a/out/private.rs:
+
+# env-dep:OUT_DIR=/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/build/serde-6bd03d0a97314e8a/out

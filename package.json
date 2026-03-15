@@ -1,0 +1,16 @@
+{
+    "name": "tchat",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "build:core": "npm run build -w packages/core-rust",
+        "dev:server": "npm run start:dev -w apps/server",
+        "dev:client": "npm run start -w apps/client",
+        "release": "bash scripts/release.sh",
+        "release:dry": "bash scripts/release.sh --dry-run"
+    },
+    "version": "1.0.0"
+}

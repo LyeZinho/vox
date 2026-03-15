@@ -1,0 +1,5 @@
+/home/pedro/repo/tchat/core/target/debug/deps/ctor-076bae84590747b2.d: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctor-0.2.9/src/lib.rs
+
+/home/pedro/repo/tchat/core/target/debug/deps/libctor-076bae84590747b2.so: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctor-0.2.9/src/lib.rs
+
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ctor-0.2.9/src/lib.rs:

@@ -1,0 +1,352 @@
+🏆 tchat: Roadmap Global
+🟦 Marco 1: O Núcleo Criptográfico (Rust + NAPI-RS)
+O "cérebro" de segurança que roda localmente no terminal do utilizador.
+
+[ ] Setup da Bridge: Configurar napi-rs para comunicação TS <-> Rust.
+
+[ ] Módulo de Derivação (KDF): Implementar Argon2id para transformar a senha do user na MasterKey.
+
+[ ] Gerador de Identidade: Implementar Ed25519 para criação do par de chaves (Privada/Pública).
+
+[ ] Cofre Local (.tkeys): Criar sistema de persistência cifrado com XChaCha20-Poly1305 para guardar a chave privada.
+
+[ ] Motor de Assinatura: Função para assinar payloads JSON antes do envio para o servidor.
+
+🟨 Marco 2: Infraestrutura Backend (NestJS + Redis + Postgres)
+O "Relay" cego que não conhece o conteúdo das mensagens.
+
+[ ] Esquema de Dados (Postgres): - [ ] Tabela de Users (indexada por PubKey).
+
+[ ] Tabela de Canais/Guilds.
+
+[ ] Histórico de mensagens (armazenando o envelope assinado/encriptado).
+
+[ ] Sistema de Mensageria (Redis): Configurar Pub/Sub para roteamento de mensagens em tempo real.
+
+[ ] Gateway de Autenticação: Middleware que valida a assinatura Ed25519 em cada request.
+
+[ ] Stream de Eventos (SSE): Implementar o endpoint de Server-Sent Events para entrega de mensagens sem overhead de WebSocket.
+
+[ ] Validação 2FA: Lógica de desafio TOTP (Google Authenticator) integrada no fluxo de login.
+
+[ ] Docker compose e etc
+
+[ ] Docker compose pronto para coolify
+
+🟩 Marco 3: Terminal UI (TS + Blessed)
+A interface de utilizador focada em performance e estética retro.
+
+[ ] Motor de Layout: Configurar o screen e grid do neo-blessed.
+
+[ ] Componentes Base:
+
+[ ] Sidebar de servidores e canais.
+
+[ ] Log de chat com suporte a cores ANSI.
+
+[ ] Caixa de input com histórico de comandos.
+
+[ ] Fluxo de Onboarding: - [ ] Tela de "Primeiro Acesso" (Setup de chaves).
+
+[ ] Renderizador de QR Code (ASCII) para o 2FA.
+
+[ ] Gestor de Estado Local: Sistema para gerir mensagens em memória e cache no terminal.
+
+🟪 Marco 4: Integração E2EE e UX Avançada
+Refinamento e segurança de ponta a ponta.
+
+[ ] Handshake de Sala: Implementar troca de chaves simétricas de sala (opcional, para E2EE total entre users).
+
+[ ] Sincronização de Histórico: Lógica para puxar mensagens perdidas enquanto o terminal estava offline.
+
+[ ] Notificações Nativas: Integração com alertas do SO (lib node-notifier).
+
+[ ] Auto-Update: Sistema para verificar novas versões do binário no GitHub.
+
+🟥 Marco 5: Lançamento e Transparência
+Tornar o projeto público e auditável.
+
+[ ] Documentação do Protocolo: Explicar como a criptografia funciona para auditoria da comunidade.
+
+[ ] Build Pipeline: Configurar GitHub Actions para gerar binários para Linux, Mac e Windows.
+
+[ ] Licenciamento: Definir licença Open Source (ex: MIT/GPL).
+
+[ ] Remote install script for linux/mac/windows
+
+
+
+Para um TUI (Terminal User Interface) inspirado no Discord, o segredo é o uso eficiente de Grids e Paineis Flexíveis. Como você vai usar blessed (ou neo-blessed), o layout deve ser pensado em colunas e boxes flutuantes.
+
+Aqui está uma proposta de design funcional para o tChat:
+
+🎨 Esqueleto do Layout (ASCII Mockup)
+Plaintext
+┌──┬─────────────────────┬──────────────┐
+│  │ # geral             │  Pessoas     │
+│ S│                     │              │
+│ E│ [14:02] <user_1>    │ > admin      │
+│ R│ Olá, terminal!      │   - voce     │
+│ V│                     │              │
+│ I│ [14:03] <bob>       │ > online     │
+│ D│ Alguém viu o hash?  │   - alice    │
+│ O│                     │   - mallory  │
+│ R│                     │              │
+│ E│                     │              │
+│ S│                     │              │
+├──┴─────────────────────┤              │
+│ > Digite sua mensagem..│              │
+└────────────────────────┴──────────────┘
+🛠️ Componentização no blessed
+Para manter a performance, divida a interface em 4 componentes principais:
+
+1. Sidebar de Servidores/Canais (Esquerda)
+Largura: Fixa (aprox. 15-20 caracteres).
+
+Conteúdo: Lista vertical de ícones ou nomes curtos.
+
+Interação: Tab ou Alt + Up/Down para navegar entre salas.
+
+2. Viewport de Mensagens (Centro)
+Componente: blessed.log.
+
+Comportamento: Auto-scroll para baixo. Mensagens antigas são renderizadas do cache local (.tkeys / SQLite) e as novas chegam via SSE.
+
+Dica: Use cores ANSI (via chalk ou tags do blessed {blue-fg}) para diferenciar o Nome do Usuário do conteúdo da mensagem.
+
+3. Barra de Status/Input (Inferior)
+Componente: blessed.textbox.
+
+Segurança: Ao digitar, o texto fica no buffer do TS. Ao dar Enter, o TS envia para o Rust assinar antes de disparar para o servidor.
+
+Feedback: Um pequeno indicador [SECURE] no canto, confirmando que a chave privada está carregada e ativa.
+
+4. Lista de Usuários (Direita)
+Largura: Fixa (aprox. 15 caracteres).
+
+Conteúdo: Lista de PubKeys (ou nicknames atrelados a elas).
+
+Dinâmica: Atualizada via eventos do Redis que o NestJS repassa pelo SSE (User Joined/Left).
+
+⚡ Fluxo de Telas (UX)
+O Terminal deve seguir este fluxo lógico ao ser aberto:
+
+Splash Screen: Logo em ASCII Art do tChat.
+
+Auth Overlay: * Se for a 1ª vez: Prompt para Email + Senha + Geração do QR Code de 2FA.
+
+Se já existir .tkeys: Apenas prompt da Senha para descriptografar a Private Key localmente via Rust.
+
+Main Interface: O layout de 3 colunas descrito acima.
+
+💡 Recursos Visuais "Pro"
+Modais de Erro: Se a assinatura do servidor falhar ou o SSE cair, crie um blessed.question centralizado que bloqueia a interface até a reconexão.
+
+Markdown Simples: Você pode implementar um parser simples em TS para converter **negrito** em códigos ANSI de negrito do terminal.
+
+Notificações: Use a lib node-notifier para que o usuário receba um alerta do sistema mesmo com o terminal minimizado.
+
+
+
+
+
+
+
+
+Para refinar as interfaces, precisamos separar a **TUI (Experiência do Usuário)** da **API (Contrato Técnico)**. Como o sistema é descentralizado na identidade, as interfaces de programação devem refletir a passagem de "responsabilidade" para o Rust.
+
+Aqui está o detalhamento refinado de cada camada:
+
+---
+
+## 1. Interface Visual (TUI - Blessed)
+
+O foco aqui é densidade de informação e atalhos de teclado. No terminal, o "clique" é secundário; o teclado é o rei.
+
+### **A. Componentes Principais**
+
+| Componente | Função | Tecla de Atalho |
+| --- | --- | --- |
+| **Server Rail** | Ícones verticais dos servidores (Guilds). | `Alt + 1..9` |
+| **Channel List** | Canais da Guild selecionada (#geral, #dev). | `Alt + J/K` |
+| **Chat Log** | Área de scroll com mensagens, nomes coloridos e timestamps. | `PageUp/Down` |
+| **User List** | Status de quem está online (baseado na PubKey). | `Tab (toggle)` |
+| **Input Bar** | Onde o texto é digitado. Suporta `/comandos`. | `Enter` |
+
+### **B. Estética (Look & Feel)**
+
+* **Temas:** Suporte a arquivos `.json` de temas (Nord, Dracula, Gruvbox).
+* **ASCII Art:** O logo do `tchat` deve aparecer no boot enquanto o Rust descriptografa o `.tkeys`.
+* **Feedback de Segurança:** Um pequeno ícone `🔒` no canto inferior que muda de cor (Verde: Autenticado / Amarelo: Offline / Vermelho: Erro de Assinatura).
+
+---
+
+## 2. Interface de Ponte (TS ⟷ Rust)
+
+Esta é a interface do objeto que o Rust expõe para o TypeScript via NAPI-RS.
+
+```typescript
+interface RustCore {
+  // Inicialização e Cofre
+  deriveMasterKey(password: string, email: string): Promise<boolean>;
+  isVaultInitialized(): boolean;
+  createVault(password: string, email: string): Promise<void>;
+
+  // Criptografia de Mensagem
+  signMessage(payload: string): { 
+    signature: string, 
+    pubKey: string, 
+    timestamp: number 
+  };
+  
+  decryptMessage(encryptedPayload: string, senderPubKey: string): string;
+
+  // 2FA Helper
+  generateTotpUri(issuer: string, account: string): string; // Retorna URI para o QR Code
+}
+
+```
+
+---
+
+## 3. Interface de Comunicação (Client ⟷ Server)
+
+Como o servidor é um **Relay**, o contrato deve ser rígido para evitar spam e ataques de replay.
+
+### **A. Request de Envio (POST /messages)**
+
+O servidor não aceita nada que não venha com o Header de Assinatura.
+
+```json
+{
+  "channelId": "uuid-da-sala",
+  "payload": "base64-da-msg-encriptada",
+  "signature": "ed25519-signature-hex",
+  "nonce": "numero-aleatorio-unico",
+  "timestamp": 1715600000
+}
+
+```
+
+### **B. Eventos de Recebimento (SSE - Server Sent Events)**
+
+O stream que o NestJS empurra para o terminal.
+
+```json
+event: message
+data: {
+  "id": "msg-id",
+  "sender": "PubKey-do-remetente",
+  "content": "encrypted-content",
+  "timestamp": 1715600001
+}
+
+```
+
+---
+
+## 4. Interface do Banco de Dados (PostgreSQL)
+
+O DB deve ser otimizado para buscas por PubKey e Channel.
+
+* **Users:** `id (PK)`, `pub_key (Unique)`, `username`, `created_at`.
+* **Messages:** `id`, `channel_id`, `sender_pub_key`, `content (text)`, `signature`, `timestamp`.
+* **Memberships:** `user_id`, `channel_id` (Para saber quem pode ouvir o quê no SSE).
+
+---
+
+## 5. Interface de Comandos do Terminal (CLI)
+
+Além da UI, o app deve aceitar flags de inicialização:
+
+* `tchat --init`: Força o processo de criação de nova conta.
+* `tchat --reset-vault`: Apaga o `.tkeys` local (com aviso de perda de acesso).
+* `tchat --config`: Abre um editor simples para mudar as cores da UI.
+
+## 1. Interface de Layout (Terminal)
+
+Usando a lógica da lib `blessed`, o layout será dividido em **Boxes**. Imagine uma grade de 12 colunas:
+
+### **Layout de Três Colunas**
+
+* **Sidebar (Col 1-2):** Servidores (Ícones verticais).
+* **Canais/DMs (Col 3-4):** Lista de salas do servidor selecionado.
+* **Chat Principal (Col 5-10):** Mensagens e Input.
+* **User List (Col 11-12):** Quem está na sala.
+
+### **Mockup Visual (ASCII)**
+
+```text
+ 0  1  2  3  4  5  6  7  8  9  10 11 12
+ ┌──┬──────────┬────────────────────┬─────┐
+ │S1│ # geral  │ [14:02] <alice>    │Users│
+ │  │ # dev    │ Oi! (Secure)       │- bob│
+ │S2│ # random │                    │- dev│
+ │  │          │ [14:05] <voce>     │     │
+ │S3│ DM       │ Olá mundo!         │     │
+ │  │ - bob    │                    │     │
+ │  │ - ana    │                    │     │
+ ├──┴──────────┴────────────────────┤     │
+ │ > Digite sua mensagem aqui...    │     │
+ └──────────────────────────────────┴─────┘
+
+```
+
+---
+
+## 2. Interface de Código (Estrutura de Pastas)
+
+Para um projeto público e transparente, a organização deve ser impecável.
+
+```text
+tchat/
+├── apps/
+│   ├── server/           # Nest.js + Redis + Postgres
+│   └── client/           # Terminal App (Entry point)
+├── packages/
+│   ├── core-rust/        # NAPI-RS (Argon2, Ed25519, XChaCha20)
+│   ├── ui-engine/        # Blessed/Neo-blessed components
+│   └── shared-types/     # Interfaces de DTOs e Eventos (TS)
+├── .tkeys/               # Pasta local (ignorada pelo git no root)
+└── docker-compose.yml    # Infra de dev (Postgres/Redis)
+
+```
+
+---
+
+## 3. Interfaces de Contrato (Typescript)
+
+Como o Rust fará o "trabalho sujo", definimos as interfaces que o TS usará para falar com ele e com o servidor.
+
+### **A. O "Cofre" Local (Rust Interface)**
+
+```typescript
+interface IVault {
+  // Chamado no setup ou login
+  unlock(password: string): Promise<boolean>;
+  
+  // Gera o envelope assinado para o servidor
+  prepareMessage(text: string, roomId: string): {
+    payload: string;    // Encriptado
+    signature: string;  // Assinado via Ed25519
+    pubKey: string;     // ID do remetente
+  };
+}
+
+```
+
+### **B. O Stream de Dados (SSE Interface)**
+
+```typescript
+interface IChatEvent {
+  type: 'MESSAGE' | 'USER_JOIN' | 'USER_LEAVE';
+  data: {
+    id: string;
+    senderPubKey: string;
+    content: string; // Vem encriptado do server
+    timestamp: number;
+  };
+}
+
+```
+

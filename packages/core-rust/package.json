@@ -1,0 +1,28 @@
+{
+  "name": "tchat-core",
+  "version": "1.0.0",
+  "description": "Tchat NAPI-RS core module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "tchat-core",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "x86_64-unknown-linux-gnu"
+      ]
+    }
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.0.0"
+  },
+  "engines": {
+    "node": ">= 10"
+  }
+}

@@ -1,0 +1,11 @@
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/totp_rs-b8e05b0819ef6e63.d: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/custom_providers.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/rfc.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/secret.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/url_error.rs
+
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/libtotp_rs-b8e05b0819ef6e63.rlib: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/custom_providers.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/rfc.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/secret.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/url_error.rs
+
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/libtotp_rs-b8e05b0819ef6e63.rmeta: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/custom_providers.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/rfc.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/secret.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/url_error.rs
+
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/lib.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/custom_providers.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/rfc.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/secret.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/totp-rs-5.7.1/src/url_error.rs:

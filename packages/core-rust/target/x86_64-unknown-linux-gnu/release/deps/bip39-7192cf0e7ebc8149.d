@@ -1,0 +1,11 @@
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/bip39-7192cf0e7ebc8149.d: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/internal_macros.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/mod.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/english.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/pbkdf2.rs
+
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/libbip39-7192cf0e7ebc8149.rlib: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/internal_macros.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/mod.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/english.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/pbkdf2.rs
+
+/home/pedro/repo/tchat/packages/core-rust/target/x86_64-unknown-linux-gnu/release/deps/libbip39-7192cf0e7ebc8149.rmeta: /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/lib.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/internal_macros.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/mod.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/english.rs /home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/pbkdf2.rs
+
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/lib.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/internal_macros.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/mod.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/language/english.rs:
+/home/pedro/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bip39-2.2.2/src/pbkdf2.rs:

@@ -1,0 +1,11 @@
+{
+  "name": "tchat",
+  "version": "1.0.0",
+  "description": "Secure terminal chat with E2E encryption",
+  "scripts": {
+    "start": "node dist/client/index.js",
+    "start:server": "node dist/server/main.js"
+  },
+  "os": ["linux", "darwin"],
+  "cpu": ["x64"]
+}
