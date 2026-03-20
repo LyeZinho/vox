@@ -1,6 +1,6 @@
 import { EventSource } from 'eventsource';
 
-const API_URL = process.env.TCHAT_API_URL || 'http://localhost:3000';
+const API_URL = process.env.VAX_API_URL || 'https://vox.devscafe.org';
 
 export interface Message {
     id: string;

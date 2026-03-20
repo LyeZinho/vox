@@ -1,3 +1,6 @@
+import { createContext, useContext, useState, type ReactNode } from 'react';
+import { appConfig, setTheme as updateThemeConfig } from './core/config.js';
+
 export const themes = {
     default: {
         primary: '#5865F2',      // Discord Purple
@@ -46,70 +49,49 @@ export const themes = {
     }
 };
 
-let currentTheme = themes.default;
-export let colors = currentTheme;
-
-export const switchTheme = (themeName: keyof typeof themes) => {
-    if (themes[themeName]) {
-        currentTheme = themes[themeName];
-        (colors as any) = currentTheme;
-        return true;
-    }
-    return false;
-};
-
-export const theme = {
-    style: {
-        fg: colors.text,
-        bg: colors.background,
-    },
-    border: {
-        type: 'line' as const,
-        left: '│',
-        right: '│',
-        top: '─',
-        bottom: '─',
-        topLeft: '╭',
-        topRight: '╮',
-        bottomLeft: '╰',
-        bottomRight: '╯',
-        style: {
-            fg: colors.primary,
-        },
-    },
-    sidebar: {
-        fg: colors.text,
-        bg: colors.sidebar,
-        selected: {
-            bg: colors.primary,
-            fg: colors.header,
-        }
-    },
-    serverRail: {
-        bg: colors.serverRail,
-    },
-    input: {
-        fg: colors.text,
-        bg: colors.background,
-        border: {
-            type: 'line' as const,
-            left: '│',
-            right: '│',
-            top: '─',
-            bottom: '─',
-            topLeft: '╭',
-            topRight: '╮',
-            bottomLeft: '╰',
-            bottomRight: '╯',
-            style: {
-                fg: colors.primary,
-            },
-        },
-    },
-};
-
 export const messageStates = {
     secure: { fg: '#50fa7b', label: '[SECURE]' }, // Green
     system: { fg: '#f1fa8c', label: '[SYSTEM]' }, // Yellow
     error: { fg: '#ff5555', label: '[ALERTA]' },  // Red
 };
+
+// Types
+export type ThemeName = keyof typeof themes;
+
+interface ThemeContextValue {
+  colors: (typeof themes)['default'];
+  themeName: ThemeName;
+  switchTheme: (name: ThemeName) => void;
+}
+
+// Context with placeholder initial values
+const ThemeContext = createContext<ThemeContextValue | null>(null);
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [themeName, setThemeName] = useState<ThemeName>(appConfig.themeName);
+
+  const value: ThemeContextValue = {
+    colors: themes[themeName],
+    themeName,
+    switchTheme: (name) => {
+      if (themes[name]) {
+        updateThemeConfig(name);
+        setThemeName(name);
+      }
+    },
+  };
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) {
+    throw new Error('useTheme must be used within ThemeProvider');
+  }
+  return ctx;
+}
