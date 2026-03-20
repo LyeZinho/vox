@@ -47,7 +47,7 @@ export function UnlockScreen({ onSuccess, onCancel }: Props) {
         {error && <Text color={colors.danger}>{error}</Text>}
         {status === 'loading' && <Spinner label="Desbloqueando..." />}
         <Box marginTop={1}>
-          <Text dim>Enter=submeter · Backspace=deletar</Text>
+          <Text>Enter=submeter · Backspace=deletar</Text>
         </Box>
       </Box>
     </Modal>

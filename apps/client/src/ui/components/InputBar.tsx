@@ -38,7 +38,8 @@ export function InputBar({ onSubmit, onCommand }: Props) {
       height={3}
       paddingX={1}
       borderStyle="round"
-      style={{ borderColor: colors.primary, bg: colors.background }}
+      borderColor={colors.primary}
+      backgroundColor={colors.background}
     >
       <Text color={colors.text}>{'> '}{value}</Text>
       <Text color={colors.textMuted}>_</Text>

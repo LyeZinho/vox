@@ -17,7 +17,8 @@ export function Sidebar({ rooms, currentRoom, onSelect }: Props) {
       height="100%"
       flexDirection="column"
       borderStyle="round"
-      style={{ borderColor: colors.primary, bg: colors.sidebar }}
+      borderColor={colors.primary}
+      backgroundColor={colors.sidebar}
     >
       <Box paddingX={1} paddingY={0}>
         <Text bold color={colors.primary}>🮇 CANAIS</Text>
@@ -28,14 +29,14 @@ export function Sidebar({ rooms, currentRoom, onSelect }: Props) {
             <Text
               bold={currentRoom === room.id}
               color={currentRoom === room.id ? colors.header : colors.textMuted}
-              backgroundColor={currentRoom === room.id ? colors.primary : undefined}
+              backgroundColor={currentRoom === room.id ? (colors.primary as any) : undefined}
             >
               {`# ${room.name || room.id}`}
             </Text>
           </Box>
         ))}
         {rooms.length === 0 && (
-          <Text dim color={colors.textMuted}>  Nenhuma sala</Text>
+          <Text color={colors.textMuted}>  Nenhuma sala</Text>
         )}
       </Box>
     </Box>

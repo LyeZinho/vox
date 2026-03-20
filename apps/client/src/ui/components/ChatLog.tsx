@@ -12,10 +12,11 @@ export function ChatLog({ messages }: Props) {
   return (
     <Box flexGrow={1} flexDirection="column"
       borderStyle="round" paddingX={1}
-      style={{ borderColor: colors.primary, bg: colors.background }}
+      borderColor={colors.primary}
+      backgroundColor={colors.background}
     >
       {messages.length === 0 && (
-        <Text dim color={colors.textMuted}>Nenhuma mensagem. Digite algo abaixo.</Text>
+        <Text color={colors.textMuted}>Nenhuma mensagem. Digite algo abaixo.</Text>
       )}
       {messages.map(msg => (
         <Text key={msg.nonce}>

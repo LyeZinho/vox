@@ -86,7 +86,7 @@ export function OnboardingScreen({ onSuccess, onCancel }: Props) {
             <Spinner label="Pressione ENTER para continuar..." />
           </Box>
           <Box>
-            <Text dim>Tab=mudar campo · Backspace=deletar · Enter=continuar</Text>
+            <Text>Tab=mudar campo · Backspace=deletar · Enter=continuar</Text>
           </Box>
         </Box>
       </Modal>
@@ -102,9 +102,9 @@ export function OnboardingScreen({ onSuccess, onCancel }: Props) {
         <Text bold color={colors.primary}>🮇 Bem-vindo ao VAX Chat! 🮇</Text>
 
         <Box>
-          <Text dim>Entropia: </Text>
+          <Text>Entropia: </Text>
           <Text color={entropyProgress < 50 ? 'yellow' : 'green'}>{bar}</Text>
-          <Text dim> {entropyProgress}%</Text>
+          <Text> {entropyProgress}%</Text>
         </Box>
 
         <Box>
@@ -128,7 +128,7 @@ export function OnboardingScreen({ onSuccess, onCancel }: Props) {
         {error && <Text color={colors.danger}>{error}</Text>}
 
         <Box marginTop={1}>
-          <Text dim>Tab=próximo · Enter=submeter · Backspace=deletar</Text>
+          <Text>Tab=próximo · Enter=submeter · Backspace=deletar</Text>
         </Box>
       </Box>
     </Modal>

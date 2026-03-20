@@ -22,7 +22,7 @@ export function StatusBar({ state }: Props) {
   const conn = connMap[state.connectionStatus] || connMap.disconnected;
 
   return (
-    <Box width="100%" height={1} paddingX={1} style={{ bg: colors.serverRail }}>
+    <Box width="100%" height={1} paddingX={1} backgroundColor={colors.serverRail}>
       <Text color={conn.color}>{conn.icon}</Text>
       <Text color={colors.text}> {conn.label} ┃ </Text>
       <Text bold color={colors.text}>{state.isUnlocked ? '▓ SECURE' : '░ LOCKED'}</Text>
