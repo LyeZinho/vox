@@ -1,4 +1,4 @@
-# tchat - Secure Terminal Chat
+# vox - Secure Terminal Chat
 
 A cryptographically secure, end-to-end encrypted terminal chat application.
 
