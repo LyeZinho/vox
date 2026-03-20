@@ -1,0 +1,304 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [ink-migration]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. 1.0.0)'
+        required: false
+        type: string
+
+env:
+  CORE_NAME: vax-core
+  NODE_VERSION: '22'
+
+jobs:
+  # ─── Build Rust core for all platforms ────────────────────────────────
+  build-core:
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runs-on: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact: vax-core.x86_64-unknown-linux-gnu.node
+          - runs-on: ubuntu-22.04
+            target: aarch64-unknown-linux-gnu
+            artifact: vax-core.aarch64-unknown-linux-gnu.node
+          - runs-on: windows-2022
+            target: x86_64-pc-windows-msvc
+            artifact: vax-core.x86_64-pc-windows-msvc.node
+          - runs-on: macos-14
+            target: aarch64-apple-darwin
+            artifact: vax-core.aarch64-apple-darwin.node
+          - runs-on: macos-14
+            target: x86_64-apple-darwin
+            artifact: vax-core.x86_64-apple-darwin.node
+        exclude:
+          - runs-on: ubuntu-22.04
+            target: aarch64-unknown-linux-gnu  # only if cross-compile fails
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (${{ matrix.target }})
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install LLVM (for linking)
+        if: matrix.runs-on == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y llvm clang
+
+      - name: Build Rust core
+        run: |
+          cd packages/core-rust
+          npm ci
+          npx napi build \
+            --platform \
+            --release \
+            --target ${{ matrix.target }} \
+            --dist-dir ../dist
+
+      - name: Rename artifact
+        shell: bash
+        run: |
+          cd packages
+          CORE_DIR="core-rust/dist/${{ matrix.target }}"
+          # Find the .node file
+          NODE_FILE=$(find "$CORE_DIR" -name "*.node" 2>/dev/null | head -1)
+          if [ -n "$NODE_FILE" ]; then
+            cp "$NODE_FILE" "${{ matrix.artifact }}"
+            echo "Built: ${{ matrix.artifact }}"
+          else
+            echo "No .node file found in $CORE_DIR"
+            find "$CORE_DIR" -type f | head -20
+          fi
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-${{ matrix.target }}
+          path: packages/${{ matrix.artifact }}
+          retention-days: 5
+
+  # ─── Build client (Ink React) ─────────────────────────────────────────
+  build-client:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build client
+        run: npm run build -w apps/client
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: apps/client/dist
+          retention-days: 5
+
+  # ─── Assemble release package ──────────────────────────────────────────
+  release:
+    needs: [build-core, build-client]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all core binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+
+      - name: Download client
+        uses: actions/download-artifact@v4
+        with:
+          name: client-dist
+          path: release/client
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif startsWith(github.ref, 'refs/tags/v'); then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION="dev-$(date +%Y%m%d-%H%M%S)"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION"
+
+      - name: Create installer scripts
+        run: |
+          # Linux/macOS installer
+          cat > release/install.sh << 'INSTALLER_EOF'
+          #!/bin/bash
+          set -e
+          VERSION="{{VERSION}}"
+          INSTALL_DIR="${HOME}/.vax"
+          BIN_DIR="${HOME}/.local/bin"
+          ASSET_URL="https://github.com/LyeZinho/vox/releases/download/v${VERSION}"
+
+          mkdir -p "${INSTALL_DIR}"
+          mkdir -p "${BIN_DIR}"
+
+          detect_os() {
+            case "${OSTYPE}" in
+              linux*) echo "linux" ;;
+              darwin*) echo "darwin" ;;
+              msys*|cygwin*|win32*) echo "windows" ;;
+              *) echo "unknown"
+            esac
+          }
+
+          detect_arch() {
+            case "$(uname -m)" in
+              x86_64|amd64) echo "x64" ;;
+              aarch64|arm64) echo "arm64" ;;
+              *) echo "x64"
+            esac
+          }
+
+          OS=$(detect_os)
+          ARCH=$(detect_arch)
+
+          echo "[vax] Installing VAX Chat v${VERSION} for ${OS}-${ARCH}..."
+
+          if [ "${OS}" = "linux" ]; then
+            PLATFORM="unknown-linux-gnu"
+          elif [ "${OS}" = "darwin" ]; then
+            PLATFORM="apple-darwin"
+          else
+            echo "[vax] Error: Windows should use install.ps1"
+            exit 1
+          fi
+
+          ARCH_TRIPLET=""
+          if [ "${ARCH}" = "x64" ]; then
+            if [ "${OS}" = "linux" ]; then ARCH_TRIPLET="x86_64-${PLATFORM}"; fi
+            if [ "${OS}" = "darwin" ]; then ARCH_TRIPLET="x86_64-${PLATFORM}"; fi
+          else
+            if [ "${OS}" = "linux" ]; then ARCH_TRIPLET="aarch64-${PLATFORM}"; fi
+            if [ "${OS}" = "darwin" ]; then ARCH_TRIPLET="aarch64-${PLATFORM}"; fi
+          fi
+
+          CORE_NAME="vax-core.${ARCH_TRIPLET}.node"
+
+          echo "[vax] Downloading vax-core..."
+          curl -L --fail --progress-bar \
+            "${ASSET_URL}/${CORE_NAME}" \
+            -o "${INSTALL_DIR}/${CORE_NAME}"
+
+          echo "[vax] Downloading client..."
+          curl -L --fail --progress-bar \
+            "${ASSET_URL}/client.tar.gz" \
+            -o "${INSTALL_DIR}/client.tar.gz"
+
+          tar -xzf "${INSTALL_DIR}/client.tar.gz" -C "${INSTALL_DIR}/"
+
+          # Create launcher script
+          if [ -n "${VAX_SERVER}" ]; then
+            SERVER_ARG="--server ${VAX_SERVER}"
+          else
+            SERVER_ARG=""
+          fi
+
+          cat > "${BIN_DIR}/vax" << LAUNCHER_EOF
+          #!/bin/bash
+          export VAX_HOME="\${HOME}/.vax"
+          exec node "\${HOME}/.vax/client/index.js" \${SERVER_ARG} "\$@"
+          LAUNCHER_EOF
+
+          chmod +x "${BIN_DIR}/vax"
+
+          echo ""
+          echo "[vax] Installed to \${HOME}/.vax"
+          echo "[vax] Symlinked to \${BIN_DIR}/vax"
+          echo ""
+          echo "Add to PATH if needed:"
+          echo "  export PATH=\"\${HOME}/.local/bin:\${PATH}\""
+          echo ""
+          echo "Custom server:"
+          echo "  VAX_SERVER=https://your-server.com vax"
+          INSTALLER_EOF
+          chmod +x release/install.sh
+
+          # Windows PowerShell installer
+          cat > release/install.ps1 << 'WIN_EOF'
+          # VAX Chat Windows Installer
+          $ErrorActionPreference = "Stop"
+          $Version = "{{VERSION}}"
+          $InstallDir = "$env:USERPROFILE\.vax"
+          $BinDir = "$env:USERPROFILE\AppData\Local\Microsoft\WindowsApps"
+          $AssetUrl = "https://github.com/LyeZinho/vox/releases/download/v${Version}"
+
+          New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
+
+          Write-Host "[vax] Downloading vax-core for Windows..."
+          Invoke-WebRequest -Uri "${AssetUrl}/vax-core.x86_64-pc-windows-msvc.node" `
+            -OutFile "$InstallDir\vax-core.x86_64-pc-windows-msvc.node" `
+            -UserAgent "vax-installer"
+
+          Write-Host "[vax] Downloading client..."
+          Invoke-WebRequest -Uri "${AssetUrl}/client.zip" `
+            -OutFile "$InstallDir\client.zip" `
+            -UserAgent "vax-installer"
+
+          Expand-Archive -Path "$InstallDir\client.zip" -DestinationPath $InstallDir -Force
+
+          $ServerArg = if ($env:VAX_SERVER) { "--server $env:VAX_SERVER" } else { "" }
+
+          @"
+          @echo off
+          set VAX_HOME=%USERPROFILE%\.vax
+          node %USERPROFILE%\.vax\client\index.js %SERVERARG% %*
+          "@ | Out-File -FilePath "$BinDir\vax.cmd" -Encoding ASCII -Force
+
+          Write-Host ""
+          Write-Host "[vax] Installed to $InstallDir" -ForegroundColor Green
+          Write-Host "[vax] Run: vax" -ForegroundColor Green
+          Write-Host "[vax] Custom server: `$env:VAX_SERVER=https://your-server.com" -ForegroundColor Yellow
+          WIN_EOF
+
+      - name: Package client for upload
+        run: |
+          cd release
+          tar -czf client.tar.gz client/
+          echo "Client package size:"
+          du -sh client.tar.gz
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+          generate_release_notes: true
+          files: |
+            release/vax-core.*.node
+            release/client.tar.gz
+            release/client.zip
+            release/install.sh
+            release/install.ps1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

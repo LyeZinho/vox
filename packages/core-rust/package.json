@@ -1,15 +1,19 @@
 {
-  "name": "tchat-core",
+  "name": "vax-core",
   "version": "1.0.0",
-  "description": "Tchat NAPI-RS core module",
+  "description": "VAX Chat NAPI-RS crypto core",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
-    "name": "tchat-core",
+    "name": "vax-core",
     "triples": {
       "defaults": false,
       "additional": [
-        "x86_64-unknown-linux-gnu"
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-pc-windows-msvc",
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin"
       ]
     }
   },
@@ -23,6 +27,6 @@
     "@napi-rs/cli": "^3.0.0"
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">= 18"
   }
 }

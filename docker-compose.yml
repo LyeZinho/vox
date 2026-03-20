@@ -3,24 +3,24 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: tchat-db
+    container_name: vax-db
     environment:
-      POSTGRES_USER: tchat_user
-      POSTGRES_PASSWORD: tchat_password
-      POSTGRES_DB: tchat
+      POSTGRES_USER: vax_user
+      POSTGRES_PASSWORD: vax_password
+      POSTGRES_DB: vax
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U tchat_user -d tchat"]
+      test: ["CMD-SHELL", "pg_isready -U vax_user -d vax"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: tchat-redis
+    container_name: vax-redis
     ports:
       - "${REDIS_PORT:-6381}:6379"
     volumes:
@@ -35,11 +35,11 @@ services:
     build:
       context: .
       dockerfile: apps/server/Dockerfile
-    container_name: tchat-server
+    container_name: vax-server
     ports:
       - "${SERVER_PORT:-3000}:3000"
     environment:
-      DATABASE_URL: postgres://tchat_user:tchat_password@postgres:5432/tchat
+      DATABASE_URL: postgres://vax_user:vax_password@postgres:5432/vax
       REDIS_URL: redis://redis:6379
       PORT: 3000
       NODE_ENV: production

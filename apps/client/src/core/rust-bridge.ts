@@ -1,14 +1,58 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const nodeRequire = createRequire(import.meta.url);
 
-const CORE_PATH = path.resolve(__dirname, '../../../../packages/core-rust/tchat-core.linux-x64-gnu.node');
+function getPlatformTriple(): string {
+    const platform = process.platform;
+    const arch = process.arch;
 
-const core = nodeRequire(CORE_PATH);
+    const map: Record<string, string> = {
+        'linux-x64':   'x86_64-unknown-linux-gnu',
+        'linux-arm64':  'aarch64-unknown-linux-gnu',
+        'darwin-x64':   'x86_64-apple-darwin',
+        'darwin-arm64': 'aarch64-apple-darwin',
+        'win32-x64':    'x86_64-pc-windows-msvc',
+    };
+
+    const key = `${platform}-${arch}`;
+    const triple = map[key];
+
+    if (!triple) {
+        throw new Error(`Unsupported platform: ${platform}-${arch}. Supported: ${Object.keys(map).join(', ')}`);
+    }
+
+    return triple;
+}
+
+function findCoreBinary(): string {
+    const triple = getPlatformTriple();
+    const binaryName = `vax-core.${triple}.node`;
+
+    const candidates = [
+        path.resolve(__dirname, '../../../../../packages/core-rust', binaryName),
+        path.resolve(__dirname, '../../../../core-rust', binaryName),
+        path.resolve(process.env.VAX_HOME || path.join(os.homedir(), '.vax'), binaryName),
+    ];
+
+    for (const candidate of candidates) {
+        try {
+            require('fs').accessSync(candidate);
+            return candidate;
+        } catch {}
+    }
+
+    throw new Error(
+        `vax-core not found (expected: ${binaryName}). ` +
+        `Install with: curl -sSL https://raw.githubusercontent.com/LyeZinho/vox/main/install.sh | bash`
+    );
+}
+
+const CORE_PATH = findCoreBinary();
+const core = createRequire(import.meta.url)(CORE_PATH);
 
 export interface IdentityKeys {
     publicKey: Buffer;
